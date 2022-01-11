@@ -6,21 +6,10 @@ import sys
 import time
 
 import requests
-import requests_cache
-from requests_cache.backends.sqlite import DbCache
 import sqlite3
 
-PROJECT_PATH = "/Users/kev/projs/CoinQuoteIngester"
-sqlite_cache = DbCache(
-    db_path=f"{PROJECT_PATH}/data/cryptocompare_cache.sqlite")
-requests_cache.install_cache(
-    cache_name="cryptocompare_cache",
-    backend=sqlite_cache,
-    expire_after=-1,  # never expire
-    allowable_codes=(200, 301, 404),  # cache responses for these codes
-)
+from config import *
 
-# Example URL: https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD
 BASE_URI = """
 https://min-api.cryptocompare.com/data/price?fsym={from_curr}&tsyms={to_curr}"""
 
@@ -43,9 +32,9 @@ def fstring(t, **kwargs):
 
 def get_db_conn(from_curr, to_curr):
     db_conn = sqlite3.connect(
-        database=fstring("{PROJECT_PATH}/data/coinquote_{from_curr}_"
+        database=fstring("{DB_PATH}/coinquote_{from_curr}_"
                          "{to_curr}.sqlite",
-                         PROJECT_PATH=PROJECT_PATH,
+                         DB_PATH=DB_PATH,
                          from_curr=from_curr,
                          to_curr=to_curr))
     db_conn.execute(fstring(
